@@ -11,29 +11,22 @@ ENV SAMTOOLS_VER 1.9
 # RUN apt-get update
 
 # Install Bowtie2.2.9 (Bowtie2 in KBase 2019-01-16 is version 2.3.2)
+
+# Install Bowtie2.2.9 (Bowtie2 in KBase 2019-01-16 is version 2.3.2)
 RUN VERSION='2.2.9' \
     && mkdir bowtie2-bin \
-    && wget --no-verbose "http://sourceforge.net/projects/bowtie-bio/files/bowtie2/${VERSION}/bowtie2-${VERSION}-source.zip" \
-    && unzip -q bowtie2-${VERSION}-source.zip \
+    && curl -L -o bowtie2-${VERSION}.zip "https://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.2.9/bowtie2-2.2.9-linux-x86_64.zip/download" \
+    && unzip -q bowtie2-${VERSION}.zip \
     && cd bowtie2-${VERSION} \
-    && make NO_TBB=1 \
     && cp bowtie2 bowtie2-align-l bowtie2-align-s bowtie2-build bowtie2-build-l bowtie2-build-s \
           bowtie2-inspect bowtie2-inspect-l bowtie2-inspect-s ../bowtie2-bin \
     && cd .. \
     && rm -rf bowtie2-${VERSION}*
 
 # Install samtools
-RUN cd /opt \
-    && wget https://github.com/samtools/samtools/releases/download/$SAMTOOLS_VER/samtools-$SAMTOOLS_VER.tar.bz2 \
-    && tar xvjf samtools-$SAMTOOLS_VER.tar.bz2 \
-    && rm -f samtools-$SAMTOOLS_VER.tar.bz2 \
-    && cd samtools-$SAMTOOLS_VER \
-    && ./configure \
-    && make \
-    && make install
+RUN conda install -c bioconda samtools
 
-ENV PATH $PATH:/opt/samtools-$SAMTOOLS_VER
-
+ENV PATH $PATH:/bowtie2-bin
 
 
 # -----------------------------------------
