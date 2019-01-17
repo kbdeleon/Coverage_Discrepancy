@@ -1,27 +1,50 @@
 from installed_clients.GenomeFileUtilClient import GenomeFileUtil
 from installed_clients.ReadsUtilsClient import ReadsUtils
 from installed_clients.GenomeAnnotationAPIClient import GenomeAnnotationAPI
+from installed_clients.AssemblyUtilClient import AssemblyUtil
 import logging
+import subprocess
+import os
+
+
 
 class CoverageDiscrepancyUtil:
-    def __init__(self,config):
+    bowtie_build_path = '/bowtie2-bin/bowtie2-build'
+    bowtie2_path = '/bowtie2-bin/bowtie2'
+    workdir = 'tmp/work'
+    alignout = os.path.join(workdir,'bowtie2_alignment.sam')
+    idx = os.path.join(workdir,'genome_idx_')
+
+    def __init__(self, config):
+        os.makedirs(self.workdir, exist_ok = True)
         self.config = config
-        #instantiate class
+        # instantiate class
         self.callback_url = config['SDK_CALLBACK_URL']
         self.scratch = config['scratch']
         self.gfu = GenomeFileUtil(self.callback_url)
         self.ru = ReadsUtils(self.callback_url)
         self.gaa = GenomeAnnotationAPI(self.callback_url)
+        self.au = AssemblyUtil(self.callback_url)
 
-    def run(self,params):
+    def run(self, params):
         # Get the read library as deinterleaved fastq files
- #       reads_filepath = self.get_reads_filepaths(params['reads_input'])
+        #       reads_filepath = self.get_reads_filepaths(params['reads_input'])
+        reads_filepath = ''
         genome_filepath = self.get_genome_filepath(params['genome_input_ref'])
+        self.run_bowtie2(genome_filepath, reads_filepath)
         print(params)
         output = {}
         return output
 
-    def get_reads_filepaths(self,input_ref):
+    def run_bowtie2(self, genome_filepath, reads_filepath):
+        subprocess.call([self.bowtie_build_path, "-q", genome_filepath, self.idx])
+        proc = subprocess.Popen([self.bowtie2_path, "-t", "-p", "2", "-x", self.idx, reads_filepath, "-S", self.alignout],
+                                stderr=subprocess.PIPE)
+        output = proc.communicate()[1]
+        return
+
+
+    def get_reads_filepaths(self, input_ref):
         """
         This function needs a description
         :param input_ref:
@@ -41,7 +64,6 @@ class CoverageDiscrepancyUtil:
             print(f)
         return files
 
-
     # def _get_assembly_info(self, ref):
     #     ''' given a ref to an assembly or genome, figure out the assembly and return its info '''
     #     info = self.ws.get_object_info3({'objects': [{'ref': ref}]})['infos'][0]
@@ -60,18 +82,15 @@ class CoverageDiscrepancyUtil:
     #
     #     raise ValueError('Input object was not of type: Assembly, ContigSet or Genome.  Cannot get Bowtie2 Index.')
 
-
     # Shouldn't need this if get_assembly_info works
     # def determine_genome_or_assembly(self,genome_input_ref):
     #     pass
 
-    def get_genome_filepath(self,genome_ref):
-        genome = self.gaa.get_assembly({'ref': genome_ref})
-        print(genome)
-
-
-    def call_bowtie2(self,reads_filepath,):
-        pass
+    def get_genome_filepath(self, genome_ref):
+        assembly_ref = self.gaa.get_assembly({'ref': genome_ref})
+        fasta_file = self.au.get_assembly_as_fasta({'ref': assembly_ref})
+        logging.info(fasta_file['path'])
+        return fasta_file["path"]
 
         # print("Input parameters: " + pformat(params))
         # object_ref = params['object_ref']
@@ -107,4 +126,3 @@ class CoverageDiscrepancyUtil:
     #         raise TypeError('The Genome ' + name + ' has no assembly or contigset references')
     #     # Return a reference path of `genome_ref;assembly_ref`
     #     return genome_ref + ';' + assembly_ref
-
