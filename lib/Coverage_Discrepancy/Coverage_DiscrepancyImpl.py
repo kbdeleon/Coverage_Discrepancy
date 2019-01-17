@@ -2,6 +2,7 @@
 #BEGIN_HEADER
 import logging
 import os
+from .utils.CoverageDiscrepancyUtil import CoverageDiscrepancyUtil
 
 from installed_clients.KBaseReportClient import KBaseReport
 #END_HEADER
@@ -37,6 +38,10 @@ class Coverage_Discrepancy:
         self.shared_folder = config['scratch']
         logging.basicConfig(format='%(created)s %(levelname)s: %(message)s',
                             level=logging.INFO)
+        self.config = config
+        self.config['SDK_CALLBACK_URL'] = self.callback_url
+        self.config['KB_AUTH_TOKEN'] = os.environ['KB_AUTH_TOKEN']
+
         #END_CONSTRUCTOR
         pass
 
@@ -51,14 +56,17 @@ class Coverage_Discrepancy:
         # ctx is the context object
         # return variables are: output
         #BEGIN run_Coverage_Discrepancy
-        report = KBaseReport(self.callback_url)
-        report_info = report.create({'report': {'objects_created':[],
-                                                'text_message': params['parameter_1']},
-                                                'workspace_name': params['workspace_name']})
-        output = {
-            'report_name': report_info['name'],
-            'report_ref': report_info['ref'],
-        }
+        logging.info(params)
+        cov_discrep_runner = CoverageDiscrepancyUtil(self.config)
+        output = cov_discrep_runner.run(params)
+        # report = KBaseReport(self.callback_url)
+        # report_info = report.create({'report': {'objects_created':[],
+        #                                         'text_message': params['parameter_1']},
+        #                                         'workspace_name': params['workspace_name']})
+        # output = {
+        #     'report_name': report_info['name'],
+        #     'report_ref': report_info['ref'],
+        # }
         #END run_Coverage_Discrepancy
 
         # At some point might do deeper type checking...

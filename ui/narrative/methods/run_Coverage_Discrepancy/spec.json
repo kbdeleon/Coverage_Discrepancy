@@ -48,10 +48,12 @@
                     "target_property": "workspace_id"
                 },{
                     "input_parameter": "reads_input",
-                    "target_property": "reads_input"
+                    "target_property": "reads_input",
+                    "target_type_transform": "resolved-ref"
                 },{
                     "input_parameter": "genome_input_ref",
-                    "target_property": "genome_input_ref"
+                    "target_property": "genome_input_ref",
+                    "target_type_transform": "resolved-ref" 
                 }
             ],
             "output_mapping": [

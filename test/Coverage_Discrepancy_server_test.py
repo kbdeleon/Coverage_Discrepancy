@@ -54,6 +54,12 @@ class Coverage_DiscrepancyTest(unittest.TestCase):
 
     # NOTE: According to Python unittest naming rules test method names should start from 'test'. # noqa
     def test_your_method(self):
+        #    {
+        #"reads_input": "rhodo.art.q50.SE.reads.fastq",
+        #"genome_input_ref": "Shewanella_oneidensis_MR-1"
+    #},
+
+
         # Prepare test objects in workspace if needed using
         # self.getWsClient().save_objects({'workspace': self.getWsName(),
         #                                  'objects': []})
@@ -64,4 +70,5 @@ class Coverage_DiscrepancyTest(unittest.TestCase):
         # Check returned data with
         # self.assertEqual(ret[...], ...) or other unittest methods
         ret = self.serviceImpl.run_Coverage_Discrepancy(self.ctx, {'workspace_name': self.wsName,
-                                                             'parameter_1': 'Hello World!'})
+                                                                   'reads_input': '23049/2/2',
+                                                                   'genome_input_ref': '23049/4/1'})
