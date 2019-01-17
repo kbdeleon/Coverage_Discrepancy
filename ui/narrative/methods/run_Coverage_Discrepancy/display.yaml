@@ -1,0 +1,54 @@
+#
+# define display information
+#
+name: temp_name_display_Coverage_Discrepancy
+
+tooltip: |
+    Align short sequencing reads to a prokaryotic genome sequence using Bowtie2 and look for regions with increased coverage compared to the average genome coverage which may indicate a tandem duplication that has been missed during assembly.
+
+screenshots: []
+
+icon: icon.png
+
+#
+# define a set of similar apps that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            [kb_bowtie2]
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    genome_input_ref :
+        ui-name : |
+            Genome
+        short-hint : |
+            The genome sequence to map sequences
+    reads_input :
+        ui-name : |
+            Short reads library
+        short-hint : |
+            The genome sequence to map sequences
+
+
+description : |
+    <p>This App aligns short sequencing reads to a long reference genome and
+    analyzes the sequencing depth for discrepancies of increased coverage that
+    suggest a tandem duplication may have been missed in the assembly
+    process.</p>
+
+    <p>Currently, the minimum size for a region of increased coverage is 1500bp.
+    This setting will be modifiable in future iterations of this app.  Also,
+    this app currently flags regions with >1.5x average coverage, but this will
+    also be modifiable in future iterations of this app. </p>
+
+publications :
+    -
+        display-text: |
+            De Leon KB. Wall JD. Tandem duplications are common in prokaryotic genomes but are often missed in genome assemblies.
+        link: In preparaton
